@@ -239,17 +239,17 @@ function fixPostalCode(postalCode) {
     postalCode = postalCode.trim().toUpperCase();
     let invalidFirst = ['D', 'F', 'I', 'O', 'W', 'Q', 'U', 'Z'];
     let invalidThirdFifth = ['D', 'F', 'I', 'O', 'Q', 'U'];
-    let regex = /(([a-zA-Z])\d([a-zA-Z]))[ ]?(\d([a-zA-Z])\d)/;
+    let regex = /([a-zA-Z]\d[a-zA-Z])[ ]?(\d[a-zA-Z]\d)/;
     let codes = postalCode.match(regex);
     if (codes && codes[0] === postalCode) {
       if (
         !(
-          invalidFirst.includes(codes[2]) ||
-          invalidThirdFifth.includes(codes[3]) ||
-          invalidThirdFifth.includes(codes[5])
+          invalidFirst.includes(codes[1][0]) ||
+          invalidThirdFifth.includes(codes[1][2]) ||
+          invalidThirdFifth.includes(codes[2][1])
         )
       ) {
-        validPostal = `${codes[1]} ${codes[4]}`;
+        validPostal = `${codes[1]} ${codes[2]}`;
 
         return validPostal;
       }
@@ -300,6 +300,90 @@ function fixPostalCode(postalCode) {
  ******************************************************************************/
 
 function toProvince(postalCode, useShortForm) {
+  var validPostal;
+  var province;
+  var provinceData = {
+    on: ['K', 'L', 'M', 'N', 'P'],
+    qc: ['G', 'H', 'J'],
+    ns: ['B'],
+    nb: ['E'],
+    mb: ['R'],
+    bc: ['V'],
+    pe: ['C'],
+    sk: ['S'],
+    ab: ['T'],
+    nl: ['A'],
+    nt: ['X'],
+    yt: ['Y']
+  };
+  try {
+    validPostal = fixPostalCode(postalCode);
+  } catch (error) {
+    return null;
+  }
+  let firstLetter = validPostal[0];
+  switch (firstLetter) {
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'P':
+      province = 'Ontario';
+      if (useShortForm) province = 'ON';
+      break;
+    case 'G':
+    case 'H':
+    case 'J':
+      province = 'Quebec';
+      if (useShortForm) province = 'QC';
+      break;
+    case 'B':
+      province = 'Nova Scotia';
+      if (useShortForm) province = 'NS';
+      break;
+    case 'E':
+      province = 'New Brunswick';
+      if (useShortForm) province = 'NB';
+      break;
+    case 'R':
+      province = 'Manitoba';
+      if (useShortForm) province = 'MB';
+      break;
+    case 'V':
+      province = 'British Columbia';
+      if (useShortForm) province = 'BC';
+      break;
+    case 'C':
+      province = 'Prince Edward Island';
+      if (useShortForm) province = 'PE';
+      break;
+    case 'S':
+      province = 'Saskatchewan';
+      if (useShortForm) province = 'SK';
+      break;
+    case 'T':
+      province = 'Alberta';
+      if (useShortForm) province = 'AB';
+      break;
+    case 'A':
+      province = 'Newfoundland and Labrador';
+      if (useShortForm) province = 'NL';
+      break;
+    case 'X':
+      province = 'Northwest Territories and Nunavut';
+      if (useShortForm) province = 'NT';
+      break;
+    case 'Y':
+      province = 'Yukon';
+      if (useShortForm) province = 'YT';
+      break;
+    default:
+      return null;
+  }
+  if (useShortForm) {
+    return province.slice(0, 2).toUpperCase();
+  }
+  return province;
   // Replace this comment with your code...
 }
 
