@@ -414,6 +414,28 @@ function toProvince(postalCode, useShortForm) {
  ******************************************************************************/
 
 function normalizeCoord(value) {
+  //normal layout
+  var lat, long;
+  if (value) {
+    let normalRegex = /([-]?\d+[.]?\d*)[ ]?,[ ]?([-]?\d+[.]?\d*)/;
+    let alternateRegex = /^\[([-]?\d+[.]?\d*)[ ]?,[ ]?([-]?\d+[.]?\d*)\]/;
+    var coord = value.match(alternateRegex);
+    if (coord) {
+      lat = coord[2];
+      long = coord[1];
+    } else {
+      coord = value.match(normalRegex);
+      if (coord) {
+        lat = coord[1];
+        long = coord[2];
+      }
+    }
+
+    if (lat >= -90 && lat <= 90 && long >= -180 && long <= 180) {
+      return `(${lat}, ${long})`;
+    }
+  }
+  throw new Error('Error');
   // Replace this comment with your code...
 }
 
@@ -445,6 +467,19 @@ function normalizeCoord(value) {
  ******************************************************************************/
 
 function formatCoords(...values) {
+  var coords = [];
+  var validCord;
+  if (values) {
+    for (let i = 0; i < values.length; i++) {
+      try {
+        validCord = normalizeCoord(values[i]);
+        coords.push(validCord);
+      } catch (error) {}
+    }
+    //return `(${formated})`;
+    return coords;
+  }
+  return '';
   // Replace this comment with your code...
 }
 
