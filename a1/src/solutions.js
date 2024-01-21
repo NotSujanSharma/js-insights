@@ -136,7 +136,7 @@ function greeting(name) {
  ******************************************************************************/
 
 function normalizeVariable(value) {
-  var regex = /[^ .\t]+/g;
+  let regex = /[^ .\t]+/g;
   return value.trim().toUpperCase().match(regex).join('_');
   // Replace this comment with your code...
 }
@@ -234,7 +234,28 @@ function createIframe(src, height, allowFullScreen) {
  ******************************************************************************/
 
 function fixPostalCode(postalCode) {
-  // Replace this comment with your code...
+  var validPostal;
+  if (postalCode && postalCode.trim() !== '') {
+    postalCode = postalCode.trim().toUpperCase();
+    let invalidFirst = ['D', 'F', 'I', 'O', 'W', 'Q', 'U', 'Z'];
+    let invalidThirdFifth = ['D', 'F', 'I', 'O', 'Q', 'U'];
+    let regex = /(([a-zA-Z])\d([a-zA-Z]))[ ]?(\d([a-zA-Z])\d)/;
+    let codes = postalCode.match(regex);
+    if (codes && codes[0] === postalCode) {
+      if (
+        !(
+          invalidFirst.includes(codes[2]) ||
+          invalidThirdFifth.includes(codes[3]) ||
+          invalidThirdFifth.includes(codes[5])
+        )
+      ) {
+        validPostal = `${codes[1]} ${codes[4]}`;
+
+        return validPostal;
+      }
+    }
+  }
+  throw new Error('error'); // Replace this comment with your code...
 }
 
 /*******************************************************************************
