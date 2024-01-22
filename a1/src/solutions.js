@@ -300,91 +300,35 @@ function fixPostalCode(postalCode) {
  ******************************************************************************/
 
 function toProvince(postalCode, useShortForm) {
-  var validPostal;
-  var province;
-  var provinceData = {
-    on: ['K', 'L', 'M', 'N', 'P'],
-    qc: ['G', 'H', 'J'],
-    ns: ['B'],
-    nb: ['E'],
-    mb: ['R'],
-    bc: ['V'],
-    pe: ['C'],
-    sk: ['S'],
-    ab: ['T'],
-    nl: ['A'],
-    nt: ['X'],
-    yt: ['Y']
-  };
   try {
-    validPostal = fixPostalCode(postalCode);
+    postalCode = fixPostalCode(postalCode);
   } catch (error) {
     return null;
   }
-  let firstLetter = validPostal[0];
-  switch (firstLetter) {
-    case 'K':
-    case 'L':
-    case 'M':
-    case 'N':
-    case 'P':
-      province = 'Ontario';
-      if (useShortForm) province = 'ON';
-      break;
-    case 'G':
-    case 'H':
-    case 'J':
-      province = 'Quebec';
-      if (useShortForm) province = 'QC';
-      break;
-    case 'B':
-      province = 'Nova Scotia';
-      if (useShortForm) province = 'NS';
-      break;
-    case 'E':
-      province = 'New Brunswick';
-      if (useShortForm) province = 'NB';
-      break;
-    case 'R':
-      province = 'Manitoba';
-      if (useShortForm) province = 'MB';
-      break;
-    case 'V':
-      province = 'British Columbia';
-      if (useShortForm) province = 'BC';
-      break;
-    case 'C':
-      province = 'Prince Edward Island';
-      if (useShortForm) province = 'PE';
-      break;
-    case 'S':
-      province = 'Saskatchewan';
-      if (useShortForm) province = 'SK';
-      break;
-    case 'T':
-      province = 'Alberta';
-      if (useShortForm) province = 'AB';
-      break;
-    case 'A':
-      province = 'Newfoundland and Labrador';
-      if (useShortForm) province = 'NL';
-      break;
-    case 'X':
-      province = 'Northwest Territories and Nunavut';
-      if (useShortForm) province = 'NT';
-      break;
-    case 'Y':
-      province = 'Yukon';
-      if (useShortForm) province = 'YT';
-      break;
-    default:
-      return null;
-  }
-  if (useShortForm) {
-    return province.slice(0, 2).toUpperCase();
-  }
-  return province;
-  // Replace this comment with your code...
+
+  const firstLetter = postalCode[0];
+  const provinceMap = {
+    A: useShortForm ? 'NL' : 'Newfoundland and Labrador',
+    B: useShortForm ? 'NS' : 'Nova Scotia',
+    C: useShortForm ? 'PE' : 'Prince Edward Island',
+    E: useShortForm ? 'NB' : 'New Brunswick',
+    G: useShortForm ? 'QC' : 'Quebec',
+    H: useShortForm ? 'QC' : 'Quebec',
+    J: useShortForm ? 'QC' : 'Quebec',
+    K: useShortForm ? 'ON' : 'Ontario',
+    L: useShortForm ? 'ON' : 'Ontario',
+    M: useShortForm ? 'ON' : 'Ontario',
+    N: useShortForm ? 'ON' : 'Ontario',
+    P: useShortForm ? 'ON' : 'Ontario',
+    R: useShortForm ? 'MB' : 'Manitoba',
+    S: useShortForm ? 'SK' : 'Saskatchewan',
+    T: useShortForm ? 'AB' : 'Alberta',
+    V: useShortForm ? 'BC' : 'British Columbia',
+    X: useShortForm ? 'NT' : 'Northwest Territories and Nunavut',
+    Y: useShortForm ? 'YT' : 'Yukon'
+  };
+
+  return provinceMap[firstLetter] || null;
 }
 
 /*******************************************************************************
@@ -467,20 +411,16 @@ function normalizeCoord(value) {
  ******************************************************************************/
 
 function formatCoords(...values) {
-  var coords = [];
-  var validCord;
-  if (values) {
-    for (let i = 0; i < values.length; i++) {
-      try {
-        validCord = normalizeCoord(values[i]);
-        coords.push(validCord);
-      } catch (error) {}
+  let formattedCoords = [];
+
+  for (let coord of values) {
+    try {
+      formattedCoords.push(normalizeCoord(coord));
+    } catch (error) {
+      continue;
     }
-    //return `(${formated})`;
-    return coords;
   }
-  return '';
-  // Replace this comment with your code...
+  return `(${formattedCoords.join(', ')})`;
 }
 
 /*******************************************************************************
