@@ -450,7 +450,18 @@ function formatCoords(...values) {
  ******************************************************************************/
 
 function countForProvince(provinceCode, ...postalCodes) {
-  // Replace this comment with your code...
+  var nums = 0;
+  if (!(postalCodes.length > 0)) throw new Error('No postal Codes passed');
+  for (let i = 0; i < postalCodes.length; i++) {
+    if (typeof postalCodes[i] !== 'string') throw new Error('error');
+    try {
+      var province = toProvince(postalCodes[i], true);
+      if (province && province === provinceCode) nums++;
+    } catch (Error) {
+      throw new Error('error');
+    }
+  }
+  return nums;
 }
 
 /*******************************************************************************
