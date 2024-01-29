@@ -8,9 +8,9 @@
  *
  * Please update the following with your information:
  *
- *      Name: <YOUR_NAME>
- *      Student ID: <YOUR_STUDENT_ID>
- *      Date: <SUBMISSION_DATE>
+ *      Name: Sujan Sharma
+ *      Student ID: 157775222
+ *      Date:  2024-01-29
  *
  * Please see all unit tests in the files problem-00.test.js, problem-01.test.js, etc.
  */
