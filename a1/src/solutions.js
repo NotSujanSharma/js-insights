@@ -514,6 +514,13 @@ function countForProvince(provinceCode, ...postalCodes) {
  ******************************************************************************/
 
 function generateLicenseLink(licenseCode, targetBlank) {
+  let matches = licenseCode.match(/CC-(BY.*)/);
+  if (!matches) {
+    throw new Error('Errror');
+  }
+  let cc = matches[1];
+  cc = cc.toLowerCase();
+  return `<a href="https://creativecommons.org/licenses/${cc}/4.0/">Creative Commons Attribution License</a>`;
   // Replace this comment with your code...
 }
 
