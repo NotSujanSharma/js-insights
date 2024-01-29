@@ -514,13 +514,40 @@ function countForProvince(provinceCode, ...postalCodes) {
  ******************************************************************************/
 
 function generateLicenseLink(licenseCode, targetBlank) {
-  let matches = licenseCode.match(/CC-(BY.*)/);
-  if (!matches) {
-    throw new Error('Errror');
+  let text;
+  let cc = '';
+  if (licenseCode && licenseCode !== '') {
+    let matches = licenseCode.match(/CC-(BY.*)/);
+    if (matches) {
+      cc = matches[1];
+      cc = cc.toLowerCase();
+    }
   }
-  let cc = matches[1];
-  cc = cc.toLowerCase();
-  return `<a href="https://creativecommons.org/licenses/${cc}/4.0/">Creative Commons Attribution License</a>`;
+  switch (cc) {
+    case 'by':
+      text = 'Creative Commons Attribution License';
+      break;
+    case 'by-nc':
+      text = 'Creative Commons Attribution-NonCommercial License';
+      break;
+    case 'by-sa':
+      text = 'Creative Commons Attribution-ShareAlike License';
+      break;
+    case 'by-nd':
+      text = 'Creative Commons Attribution-NoDerivs License';
+      break;
+    case 'by-nc-sa':
+      text = 'Creative Commons Attribution-NonCommercial-ShareAlike License';
+      break;
+    case 'by-nc-nd':
+      text = 'Creative Commons Attribution-NonCommercial-NoDerivs License';
+      break;
+    default:
+      return `<a href="https://choosealicense.com/no-permission/">All Rights Reserved</a>`;
+  }
+  return `<a href="https://creativecommons.org/licenses/${cc ? `${cc}/4.0/"` : ''}${
+    targetBlank ? ' target="_blank"' : ''
+  }>${text}</a>`;
   // Replace this comment with your code...
 }
 
