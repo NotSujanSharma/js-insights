@@ -1,4 +1,4 @@
-#JS Basics
+# JS Basics
 Start by running:
 ```
 npm install
