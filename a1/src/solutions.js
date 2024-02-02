@@ -138,7 +138,6 @@ function greeting(name) {
 function normalizeVariable(value) {
   let regex = /[^ .\t]+/g;
   return value.trim().toUpperCase().match(regex).join('_');
-  // Replace this comment with your code...
 }
 
 /*******************************************************************************
@@ -200,7 +199,6 @@ function createIframe(src, height, allowFullScreen) {
     return iframe;
   }
   throw new Error('Error');
-  // Replace this comment with your code...
 }
 /*******************************************************************************
  * Problem 3: fix the formatting of Canadian Postal Codes
@@ -255,7 +253,7 @@ function fixPostalCode(postalCode) {
       }
     }
   }
-  throw new Error('error'); // Replace this comment with your code...
+  throw new Error('error');
 }
 
 /*******************************************************************************
@@ -380,7 +378,6 @@ function normalizeCoord(value) {
     }
   }
   throw new Error('Error');
-  // Replace this comment with your code...
 }
 
 /*******************************************************************************
@@ -548,7 +545,6 @@ function generateLicenseLink(licenseCode, targetBlank) {
   return `<a href="https://creativecommons.org/licenses/${cc ? `${cc}/4.0/"` : ''}${
     targetBlank ? ' target="_blank"' : ''
   }>${text}</a>`;
-  // Replace this comment with your code...
 }
 
 /*******************************************************************************
@@ -576,7 +572,21 @@ function generateLicenseLink(licenseCode, targetBlank) {
  ******************************************************************************/
 
 function pureBool(value) {
-  // Replace this comment with your code...
+  const trueValues = ['yes', 'y', 'oui', 'true', 'vrai', 'v', 'o', 't'];
+  const falseValues = ['no', 'f', 'false', 'faux', 'N', 'non', 'n'];
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    value = value.toLowerCase();
+    if (trueValues.includes(value)) {
+      return true;
+    } else if (falseValues.includes(value)) {
+      return false;
+    }
+  } else if (typeof value === 'number') {
+    return value > 0;
+  } else {
+    throw new Error('invalid value');
+  }
 }
 
 /*******************************************************************************
@@ -593,16 +603,28 @@ function pureBool(value) {
  * throws on invalid data.
  ******************************************************************************/
 
-function every() {
-  // Replace this comment with your code...
+function every(...values) {
+  try {
+    return values.every((value) => pureBool(value));
+  } catch (error) {
+    return false;
+  }
 }
 
-function any() {
-  // Replace this comment with your code...
+function any(...values) {
+  try {
+    return values.some((value) => pureBool(value));
+  } catch (error) {
+    return false;
+  }
 }
 
-function none() {
-  // Replace this comment with your code...
+function none(...values) {
+  try {
+    return values.every((value) => !pureBool(value));
+  } catch (error) {
+    return false;
+  }
 }
 
 /*******************************************************************************
@@ -658,7 +680,30 @@ function none() {
  ******************************************************************************/
 
 function buildUrl(query, order, count, license) {
-  // Replace this comment with your code...
+  if (count >= 1 && count <= 30) {
+    if (order === 'asc') {
+      order = 'ascending';
+    } else if (order === 'desc') {
+      order = 'descending';
+    } else if (order !== 'ascending' && order !== 'descending') {
+      throw new Error('Order must be "ascending", "descending", "asc", or "desc".');
+    }
+    const allowedLicenses = [
+      'none',
+      'any',
+      'cc-by',
+      'cc-by-nc',
+      'cc-by-sa',
+      'cc-by-nd',
+      'cc-by-nc-sa',
+      'cc-by-nc-nd'
+    ];
+    if (allowedLicenses.includes(license)) {
+      query = encodeURIComponent(query);
+      return `https://api.inaturalist.org/v2/observations?query=${query}&count=${count}&order=${order}&license=${license}`;
+    }
+  }
+  throw new Error('error');
 }
 
 // Our unit test files need to access the functions we defined
