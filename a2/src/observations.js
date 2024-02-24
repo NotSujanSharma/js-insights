@@ -9,7 +9,7 @@
  * Please update the following with your information:
  *
  *      Name: Sujan Sharma
- *      Student ID: 15577755222
+ *      Student ID: 1557775222
  *      Date: 23rd Feb, 2024
  *
  * Please see all unit tests in the files problem-01.test.js, problem-02.test.js, etc.
@@ -110,8 +110,7 @@ function observationSummary(data) {
  ******************************************************************************/
 function observationSummary2(data) {
   data.results.forEach((result) => {
-    let date = result.observed_on_details.date;
-    console.log(`#${result.id} - ${result.species_guess} [${date}]`);
+    console.log(`#${result.id} - ${result.species_guess} [${result.observed_on_details.date}]`);
   });
 }
 
@@ -155,18 +154,17 @@ function observationSummary2(data) {
  * Your function should return the newly created Array.
  ******************************************************************************/
 function observationsByPrivacy(data, privacy) {
-  if (privacy) privacy = privacy.toLowerCase();
-  if (privacy !== 'open' && privacy !== 'obscured' && privacy !== null) {
-    throw new Error('Invalid privacy value');
-  }
-
-  let results = [];
-  for (let observation of data.results) {
-    if (observation.privacy === privacy) {
-      results.push(observation);
+  privacy = privacy ? privacy.toLowerCase() : privacy;
+  if (privacy === 'open' || privacy === 'obscured' || privacy === null) {
+    let arr = [];
+    for (let observation of data.results) {
+      if (observation.privacy === privacy) {
+        arr.push(observation);
+      }
     }
+    return arr;
   }
-  return results;
+  throw new Error('Error ');
 }
 
 /*******************************************************************************
@@ -191,12 +189,11 @@ function observationsByPrivacy(data, privacy) {
  * }
  ******************************************************************************/
 function transformObservation(original) {
-  let geoCoords = original.location.split(',');
   return {
     id: original.id,
     speciesGuess: original.species_guess,
     isResearchQuality: original.quality_grade === 'research',
-    geoCoords: [parseFloat(geoCoords[1]), parseFloat(geoCoords[0])],
+    geoCoords: original.location ? original.location.split(',').map(Number).reverse() : [],
     photoUrls: original.photos.map((photo) => photo.url),
     photosCount: original.photos.length,
     user: `@${original.user.login_exact}`
@@ -219,11 +216,11 @@ function transformObservation(original) {
  *  - return the new Array containing all the transformed Objects
  ******************************************************************************/
 function transformObservations(data) {
-  let results = [];
-  for (let observation of data.results) {
-    results.push(transformObservation(observation));
-  }
-  return results;
+  let arr = [];
+  data.results.forEach((observation) => {
+    arr.push(transformObservation(observation));
+  });
+  return arr;
 }
 
 /*******************************************************************************
@@ -274,16 +271,13 @@ function transformObservations2(data) {
  *  - use the .find() method to locate items by id, see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
  ******************************************************************************/
 function getObservationsById(data, ...ids) {
-  let results = [];
+  let arr = [];
   ids.forEach((id) => {
     let observation = data.results.find((observation) => observation.id === id);
-    if (observation) {
-      results.push(observation);
-    }
+    if (observation) arr.push(observation);
   });
-  if (results.length === 0) return null;
-  if (ids.length === 1) return results[0];
-  return results;
+  if (arr.length === 0) return null;
+  return arr.length === 1 ? arr[0] : arr;
 }
 
 /*******************************************************************************
@@ -319,21 +313,20 @@ function getObservationsById(data, ...ids) {
  ******************************************************************************/
 
 function getObservationsByPositionalAccuracy(data, options = {}) {
-  let results = data.results;
+  let arr = data.results;
   if (options.eq) {
-    results = results.filter((observation) => observation.positional_accuracy === options.eq);
+    arr = arr.filter((observation) => observation.positional_accuracy === options.eq);
   } else if (options.gte && options.lte) {
-    results = results.filter(
+    arr = arr.filter(
       (observation) =>
         observation.positional_accuracy >= options.gte &&
         observation.positional_accuracy <= options.lte
     );
   } else if (options.gte) {
-    results = results.filter((observation) => observation.positional_accuracy >= options.gte);
-  } else if (options.lte) {
-    results = results.filter((observation) => observation.positional_accuracy <= options.lte);
-  }
-  return results;
+    arr = arr.filter((observation) => observation.positional_accuracy >= options.gte);
+  } else if (options.lte)
+    arr = arr.filter((observation) => observation.positional_accuracy <= options.lte);
+  return arr;
 }
 
 /*******************************************************************************
@@ -380,19 +373,16 @@ function getObservationsByPositionalAccuracy(data, options = {}) {
  * Your function should return the new Array of photo size Objects
  ******************************************************************************/
 function getTaxonPhotos(data) {
-  let results = data.results;
   let photos = [];
-  for (let observation of results) {
-    if (observation.taxon && observation.taxon.default_photo) {
-      let photo = observation.taxon.default_photo;
-      let defaultUrl = `https://static.inaturalist.org/photos/${photo.id}`;
-      let parameter = observation.id;
+  for (let obs of data.results) {
+    if (obs.taxon && obs.taxon.default_photo) {
+      let url = `https://static.inaturalist.org/photos/${obs.taxon.default_photo.id}`;
       photos.push({
-        original: `${defaultUrl}/original.jpg?${parameter}`,
-        square: `${defaultUrl}/square.jpg?${parameter}`,
-        small: `${defaultUrl}/small.jpg?${parameter}`,
-        medium: `${defaultUrl}/medium.jpg?${parameter}`,
-        large: `${defaultUrl}/large.jpg?${parameter}`
+        original: `${url}/original.jpg?${obs.id}`,
+        square: `${url}/square.jpg?${obs.id}`,
+        small: `${url}/small.jpg?${obs.id}`,
+        medium: `${url}/medium.jpg?${obs.id}`,
+        large: `${url}/large.jpg?${obs.id}`
       });
     }
   }
@@ -458,23 +448,23 @@ function getTaxonPhotos(data) {
  ******************************************************************************/
 function getUserStats(data) {
   let users = data.results;
-  let totals = {
+  let total = {
     observations: 0,
     journals: 0,
     species: 0
   };
-  for (let user of users) {
-    totals.observations += user.user.observations_count;
-    totals.journals += user.user.journal_posts_count;
-    totals.species += user.user.species_count;
-  }
+  users.forEach((user) => {
+    total.observations += user.user.observations_count;
+    total.journals += user.user.journal_posts_count;
+    total.species += user.user.species_count;
+  });
   return {
     count: users.length,
-    totals: totals,
+    totals: total,
     averages: {
-      observations: totals.observations / users.length,
-      journals: totals.journals / users.length,
-      species: totals.species / users.length
+      observations: total.observations / users.length,
+      journals: total.journals / users.length,
+      species: total.species / users.length
     }
   };
 }
@@ -495,16 +485,16 @@ function getUserStats(data) {
  * return the Array of time zones.
  */
 function extractTimeZones(data) {
-  let timeZones = [];
-  for (let observation of data.results) {
-    if (!timeZones.includes(observation.created_time_zone)) {
-      timeZones.push(observation.created_time_zone);
+  let time_zones = [];
+  data.results.forEach((observation) => {
+    if (!time_zones.includes(observation.created_time_zone)) {
+      time_zones.push(observation.created_time_zone);
     }
-    if (!timeZones.includes(observation.observed_time_zone)) {
-      timeZones.push(observation.observed_time_zone);
+    if (!time_zones.includes(observation.observed_time_zone)) {
+      time_zones.push(observation.observed_time_zone);
     }
-  }
-  return timeZones;
+  });
+  return time_zones;
 }
 
 /**
@@ -522,12 +512,12 @@ function extractTimeZones(data) {
  */
 
 function extractTimeZones2(data) {
-  let timeZones = new Set();
-  for (let observation of data.results) {
-    timeZones.add(observation.created_time_zone);
-    timeZones.add(observation.observed_time_zone);
-  }
-  return Array.from(timeZones);
+  let time_zones = new Set();
+  data.results.forEach((observation) => {
+    time_zones.add(observation.created_time_zone);
+    time_zones.add(observation.observed_time_zone);
+  });
+  return Array.from(time_zones);
 }
 
 // Our unit test files need to access the functions we defined
